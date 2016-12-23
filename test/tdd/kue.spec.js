@@ -230,13 +230,13 @@ describe('Kue', function () {
     it('should set the activeJobsTTL lock', function () {
       queue.checkActiveJobTtl();
       clock.tick(timeout);
-      queue.warlock.lock.calledWith('activeJobsTTL').should.be.true;
+      queue.warlock.lock.calledWith('q:activeJobsTTL').should.be.true;
     });
 
     it('should load all expired jobs', function () {
       queue.checkActiveJobTtl();
       clock.tick(timeout);
-      client.zrangebyscore.calledWith('q:jobs:active'), 100000, sinon.match.any, "LIMIT", 0, 1000).should.be.true;
+      client.zrangebyscore.calledWith('q:jobs:active', 100000, sinon.match.any, "LIMIT", 0, 1000).should.be.true;
     });
 
     it('should emit ttl exceeded for each job', function () {
@@ -330,7 +330,7 @@ describe('Kue', function () {
 
     it('should get the requested setting', function (done) {
       queue.setting('name', function () {
-        client.hget.calledWith('q:settings'), 'name').should.be.true;
+        client.hget.calledWith('q:settings', 'name').should.be.true;
         done();
       });
     });
@@ -388,7 +388,7 @@ describe('Kue', function () {
       };
       queue.process('type', 3, sinon.stub());
       worker.emit('job complete', job);
-      client.incrby.calledWith('q:stats:work-time'), job.duration).should.be.true;
+      client.incrby.calledWith('q:stats:work-time', job.duration).should.be.true;
     });
 
     it('should setup timers', function () {
